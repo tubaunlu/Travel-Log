@@ -129,7 +129,7 @@ class LearnMoreScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Başlık
+          
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
