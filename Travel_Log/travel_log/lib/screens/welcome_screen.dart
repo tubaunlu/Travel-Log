@@ -162,10 +162,10 @@ class LanguageSelector extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
         );
-
+  //To be added to the widget file
     return SafeArea(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,             
         children: [
           dragHandle(),
           _langTile(context, code: 'en', label: 'English', flag: '🇺🇸'),
