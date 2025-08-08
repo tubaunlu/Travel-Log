@@ -126,7 +126,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           const SizedBox(height: 30),
 
-          // Hata mesajını burada kontrol et ve ekrana yazdır
           if (_errorMessage != null && _errorMessage!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
