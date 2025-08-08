@@ -13,7 +13,7 @@ class LocationService {
     } catch (e) {
       if (kDebugMode) {
         if (kDebugMode) {
-          print("Konum kaydedilirken hata oluştu: $e");
+          print("An error occurred while saving the location: $e");
         }
       }
     }
