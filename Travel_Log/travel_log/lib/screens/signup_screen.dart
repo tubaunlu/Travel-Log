@@ -78,7 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } catch (e) {
         if (kDebugMode) {
       print("General Error: $e");
-        }  // For other errors
+        }  
         if (mounted) {
       setState(() {
         _errorMessage = "An error occurred. Please try again.";
