@@ -44,8 +44,6 @@ Travel Log is an app that helps you mark places you've visited on a map and take
 - **Flutter Map**
 - **Dart**
 
-## Application Screenshots
-
 ##License
 This project is licensed under the MIT License.
 
