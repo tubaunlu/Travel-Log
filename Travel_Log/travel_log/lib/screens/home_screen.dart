@@ -1,102 +1,200 @@
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_map/flutter_map.dart';
-// // ignore: depend_on_referenced_packages
-// import 'package:latlong2/latlong.dart';
-// import '../services/location_service.dart';
-// import '../services/log_service.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:travel_log/widgets/bottom_navbar.dart';
 
-// class HomeScreen extends StatefulWidget {
-//   const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-//   @override
-//   State<HomeScreen> createState() => _HomeScreenState();
-// }
+class _HomeScreenState extends State<HomeScreen> {
+  final backgroundColor = Colors.white;
+  final textColorPrimary = const Color(0xFF111518);
 
-// class _HomeScreenState extends State<HomeScreen> {
-//   final mapController = MapController();
-//   StreamSubscription? _locSub;
-//   LatLng? _currentLatLng;
+  int _currentIndex = 0;
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _initLocation();
-//  // 5 dakikada bir konum kaydı
-// Timer.periodic(const Duration(minutes: 5), (timer) async {
-//   if (!mounted) {
-//     timer.cancel();
-//     return;
-//   }
+  void _onTap(int index) {
+    if (index == _currentIndex) return;
+    setState(() {
+      _currentIndex = index;
+    });
+    switch (index) {
+      case 1:
+        Navigator.pushNamed(context, '/map');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/create');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/settings');
+        break;
+    }
+  }
 
-//   final pos = await LocationService.current();
-//   if (pos != null) {
-//     final text = 'Lat: ${pos.latitude}, Lng: ${pos.longitude}';
-//     await LogService.appendLog(text);
-//   }
-// });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Home',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: textColorPrimary,
+          ),
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(
+              'Recent Trips',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textColorPrimary,
+              ),
+            ),
+          ),
+  
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('trips')
+                  .orderBy('timestamp', descending: true) 
+                  .orderBy('endDate', descending: true)   
+                  .snapshots(),
+              builder: (context, snapshot) {
+      
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-//   }
+            
+                if (snapshot.hasError) {
+                  return Center(child: Text('Hata: ${snapshot.error}'));
+                }
 
-//   Future<void> _initLocation() async {
-//     final pos = await LocationService.current();
-//     if (pos == null) return;
+              
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('No trips yet'));
+                }
 
-//     final latLng = LatLng(pos.latitude, pos.longitude);
-//     setState(() => _currentLatLng = latLng);
+          
+                final trips = snapshot.data!.docs;
 
-//     // Dinamik konum güncellemesi
-//     _locSub = LocationService.stream().listen((p) {
-//       final newLatLng = LatLng(p.latitude, p.longitude);
-//       setState(() => _currentLatLng = newLatLng);
-//       mapController.move(newLatLng, mapController.camera.zoom);
-//     });
-//   }
+    
+                return ListView.builder(
+                  itemCount: trips.length,
+                  itemBuilder: (context, index) {
+                    final trip = trips[index].data() as Map<String, dynamic>;
+                    final tripName = trip['tripName'] ?? 'No Title';
+                    final notes = trip['notes'] ?? 'No Description';
+                    final timestamp = trip['timestamp'] as Timestamp?;
+                    final timeText = timestamp != null
+                        ? _formatTimestamp(timestamp)
+                        : 'Unknown Time';
 
-//   @override
-//   void dispose() {
-//     _locSub?.cancel();
-//     super.dispose();
-//   }
+                    return _buildTripCard(
+                      time: timeText,
+                      title: tripName,
+                      description: notes,
+                      assetPath: 'assets/images/default.jpg', 
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: _onTap,
+      ),
+    );
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final latLng = _currentLatLng;
+  String _formatTimestamp(Timestamp timestamp) {
+    final date = timestamp.toDate();
+    final now = DateTime.now();
+    final difference = now.difference(date);
 
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Harita')),
-//       body: latLng == null
-//           ? const Center(child: CircularProgressIndicator())
-//           : FlutterMap(
-//               mapController: mapController,
-//               options: MapOptions(
-//               ),
-//               children: [
-//                 TileLayer(
-//                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-//                   userAgentPackageName: 'com.example.flutter_application_2',
-//                 ),
-//                 MarkerLayer(
-//                   markers: [
-//                     Marker(
-//                       width: 40,
-//                       height: 40,
-//                       point: latLng,
-//                       child: const Icon(Icons.location_pin, color: Colors.red, size: 40),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//       floatingActionButton: FloatingActionButton.extended(
-//         onPressed: () {
-//           if (latLng != null) {
-//             mapController.move(latLng, 15.0);
-//           }
-//         },
-//         icon: const Icon(Icons.my_location),
-//         label: const Text('Konuma Git'),
-//       ),
-//     );
-//   }
-// }
+    if (difference.inDays < 1) {
+      return 'Today';
+    } else if (difference.inDays == 1) {
+      return '1 day ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays < 30) {
+      return '${(difference.inDays / 7).floor()} weeks ago';
+    } else {
+      return '${(difference.inDays / 30).floor()} months ago';
+    }
+  }
+
+  Widget _buildTripCard({
+    required String time,
+    required String title,
+    required String description,
+    required String assetPath,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  time,
+                  style: const TextStyle(
+                    color: Color(0xFF60788a),
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF111518),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    color: Color(0xFF60788a),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                assetPath,
+                width: 120,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

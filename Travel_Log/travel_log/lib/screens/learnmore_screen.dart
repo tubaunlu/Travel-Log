@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-class LearnMoreScreen extends StatelessWidget {
-  const LearnMoreScreen({super.key});
+
+class LearnmoreScreen extends StatelessWidget {
+  const LearnmoreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +12,6 @@ class LearnMoreScreen extends StatelessWidget {
     const textColorPrimary = Color(0xFF111518);
     const textColorSecondary = Color(0xFF60798a);
     const cardBackground = Color(0xFFF0F3F5);
-
-    
 
     Widget iconMap() {
       return Container(
@@ -94,11 +93,9 @@ class LearnMoreScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-  
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: Stack(
@@ -122,7 +119,6 @@ class LearnMoreScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             color: textColorPrimary,
-          
                           ),
                         ),
                       ),
@@ -130,30 +126,32 @@ class LearnMoreScreen extends StatelessWidget {
                   ),
                 ),
                 // Başlık
+                const SizedBox(height: 20),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
-                    'Discover the World with Wanderlust',
+                    'Discover the World with Travel Log',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 22,
+                      fontSize: 20,
                       color: textColorPrimary,
                       height: 1.2,
-              
                     ),
                   ),
                 ),
-      
+               const SizedBox(height: 38),
                 featureItem(
                   iconMap(),
                   'Map Integration',
                   'Visualize your journeys on an interactive map.',
                 ),
-                featureItem(
+                const SizedBox(height: 16),
+               featureItem(
                   iconNote(),
                   'Travel Logging',
                   'Document your adventures with photos and notes.',
                 ),
+                const SizedBox(height: 16),
                 featureItem(
                   iconUsers(),
                   'Social Sharing',
@@ -161,29 +159,6 @@ class LearnMoreScreen extends StatelessWidget {
                 ),
               ],
             ),
-        Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),
-                    onPressed: () {
-                    Navigator.pushNamed(context, '/signup');
-                    },
-                    child: const Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      letterSpacing: 0.5,
-         )            ),
-                  ),
-                ),
-              ),
           ],
         ),
       ),
