@@ -45,8 +45,6 @@ Travel Log is an app that helps you mark places you've visited on a map and take
 - **Dart**
 
 ## Application Screenshots
-![Home Screen](Travel_Log/travel_log/assets/images/home_screenshots.jpg)
-![Map Screen](Travel_Log/travel_log/assets/images/map_screenshots.jpg)
 
 ##License
 This project is licensed under the MIT License.
