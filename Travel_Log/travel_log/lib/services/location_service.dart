@@ -27,19 +27,19 @@ class LocationService {
 
   static Future<Position?> getCurrentPosition() async {
     if (!await _isLocationServiceEnabled()) {
-      if (kDebugMode) print("Konum servisi kapalı.");
+      if (kDebugMode) print("Location service is off.");
       return null;
     }
 
     if (!await _requestPermission()) {
-      if (kDebugMode) print("Konum izni verilmedi.");
+      if (kDebugMode) print("Location permission denied.");
       return null;
     }
 
     try {
       return await Geolocator.getCurrentPosition();
     } catch (e) {
-      if (kDebugMode) print("Konum alınırken hata oluştu: $e");
+      if (kDebugMode) print("An error occurred while retrieving the location.: $e");
       return null;
     }
   }
