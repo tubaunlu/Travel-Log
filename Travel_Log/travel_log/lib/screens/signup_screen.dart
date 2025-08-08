@@ -38,7 +38,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kayıt başarılı!')),
+        const SnackBar(content: Text('Registration successful!')),
       );
 
       
