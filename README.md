@@ -4,7 +4,7 @@ Travel Log, gezdiğiniz yerleri harita üzerinde işaretleyip, gezilerinizle ilg
 
 ## Özellikler
 - Kullanıcıların ziyaret ettikleri yerleri harita üzerinde kaydetmelerine olanak sağlar.
-- Kullanıcılar, konum bilgilerini ekleyebilir ve notlar bırakabilirler.
+- Kullanıcılar, konum bilgilerini ekleyebilir ve notlar bırakabilir.
 - Firebase entegrasyonu ile veriler güvenli bir şekilde saklanır.
 
 ## Teknolojiler
