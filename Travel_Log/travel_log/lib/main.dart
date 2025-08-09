@@ -1,84 +1,84 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:firebase_core/firebase_core.dart';
-import 'package:travel_log/firebase_options.dart';
-import 'package:travel_log/screens/welcome_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-// ignore: unused_import
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';  
+import 'package:firebase_core/firebase_core.dart';
+import 'package:travel_log/screens/welcome_screen.dart';
+import 'package:travel_log/screens/home_screen.dart';   
+import 'package:travel_log/screens/settings_screen.dart'; 
+import 'package:travel_log/screens/map_screen.dart';    
+import 'package:travel_log/screens/create_screen.dart';  
+import 'package:travel_log/widgets/language_manager.dart';
+import 'firebase_options.dart';  
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  WidgetsFlutterBinding.ensureInitialized();  
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,  
+    );
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error initializing Firebase: $e');  
+    }
+  }
 
-  final prefs = await SharedPreferences.getInstance();
-  final savedLocale = prefs.getString('locale') ?? 'en';
-
-  runApp(MyApp(localeCode: savedLocale));
-}
-
-class SharedPreferences {
-  static Future getInstance() async {}
+  runApp(MyApp(localeCode: 'en')); 
 }
 
 class MyApp extends StatefulWidget {
-  final String localeCode;
-  const MyApp({super.key, required this.localeCode});
+  const MyApp({super.key, required String localeCode});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  late Locale _locale;
-
-  @override
-  void initState() {
-    super.initState();
-    _locale = Locale(widget.localeCode);
-  }
-
-  void _changeLocale(String code) async {
-    // ignore: non_constant_identifier_names, prefer_typing_uninitialized_variables
-    var SharedPreferences;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('locale', code);
-
-    setState(() {
-      _locale = Locale(code);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Travel Log',
-      debugShowCheckedModeBanner: false,
-      locale: _locale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('tr'),
-        Locale('de'),
-        Locale('ru'),
-        Locale('es'),
-        Locale('fr'),
-        Locale('it'),
-        Locale('zh'),
-        Locale('ja'),
-        Locale('ar'),
-        Locale('ko'),
-      ],
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return ChangeNotifierProvider<LanguageManager>(
+      create: (_) => LanguageManager(),
+      child: Consumer<LanguageManager>(
+        builder: (context, languageManager, child) {
+          return MaterialApp(
+            title: 'Travel Log',
+            debugShowCheckedModeBanner: false,
+            locale: languageManager.locale,
+            supportedLocales: [
+              Locale('en', ''),
+              Locale('tr', ''),
+              Locale('de', ''),
+              Locale('ru', ''),
+              Locale('fr', ''),
+              Locale('es', ''),
+              Locale('ar', ''),
+              Locale('zh', ''),
+              Locale('ja', ''),
+              Locale('ko', ''),
+              Locale('pt', ''),
+              Locale('it', ''),
+              Locale('hi', ''),
+            ],
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            initialRoute: '/',  
+            routes: {
+              '/': (context) => WelcomeScreen(
+                    onLocaleChange: (code) {
+                      languageManager.changeLocale(code);  
+                    },
+                  ),
+              '/home': (context) => HomeScreen(),
+              '/settings': (context) => SettingsScreen(),
+              '/map': (context) => MapScreen(title: '',),
+              '/create': (context) => CreateScreen(address: '',),
+            },
+          );
+        },
       ),
-      home: WelcomeScreen(onLocaleChange: _changeLocale),
     );
   }
 }
-
