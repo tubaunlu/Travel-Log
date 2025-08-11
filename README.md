@@ -15,8 +15,8 @@ Travel Log, gezdiğiniz yerleri harita üzerinde işaretleyip, gezilerinizle ilg
 - **Dart**
 
 ## Uygulamanın Ekran Görüntüleri 
- ![Home Screen](Travel_Log/travel_log/assets/images/home_screenshots.jpg)
- ![Map Screen](Travel_Log/travel_log/assets/images/map_screenshots.jpg)
+ ![Home Screen](Travel_Log/travel_log/assets/images/home_screenshots.jpg)  ![Map Screen](Travel_Log/travel_log/assets/images/map_screenshots.jpg)
+
 
  ##Lisans
 Bu proje MIT Lisansı altında lisanslanmıştır.
