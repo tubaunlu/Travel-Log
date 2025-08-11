@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_log/widgets/bottom_navbar.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -11,8 +11,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final backgroundColor = Colors.white;
   final textColorPrimary = const Color(0xFF111518);
-
+  String userId = 'default_user_id';  
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final User? user = FirebaseAuth.instance.currentUser;
+    userId = user?.uid ?? 'default_user_id';  
+  }
 
   void _onTap(int index) {
     if (index == _currentIndex) return;
@@ -67,6 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
+                  .collection('users') 
+                  .doc(userId)  
                   .collection('trips')
                   .orderBy('timestamp', descending: true) 
                   .orderBy('endDate', descending: true)   

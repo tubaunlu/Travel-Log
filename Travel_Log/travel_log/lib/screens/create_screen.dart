@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:travel_log/widgets/bottom_navbar.dart';
@@ -38,15 +39,22 @@ class _CreateScreenState extends State<CreateScreen> {
   Future<void> _saveTripData() async {
     if (_selectedTripType != null && _startDate != null && _endDate != null) {
       try {
-        await FirebaseFirestore.instance.collection('trips').add({
-          'tripName': _tripNameController.text,  
-          'location': _address,       
-          'tripType': _selectedTripType,
-          'startDate': _startDate,
-          'endDate': _endDate,
-          'notes': _notesController.text,        
-          'timestamp': FieldValue.serverTimestamp(),
-        });
+        
+        final User? user = FirebaseAuth.instance.currentUser;
+        final String userId = user?.uid ?? 'default_user_id'; 
+        
+        await FirebaseFirestore.instance.collection('users')
+          .doc(userId) 
+          .collection('trips')
+          .add({
+        'tripName': _tripNameController.text,
+        'location': _address,
+        'tripType': _selectedTripType,
+        'startDate': _startDate,
+        'endDate': _endDate,
+        'notes': _notesController.text,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
         if (kDebugMode) {
           print("Trip Data Saved Successfully!");

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:travel_log/widgets/custom_scaffold.dart';
 import 'signin_screen.dart';
 
@@ -22,40 +23,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  Future<void> _signUp() async {
+ Future<void> _signUp() async {
   setState(() {
     _isLoading = true;
-    _errorMessage = null;  
+    _errorMessage = null;
   });
 
   try {
-    
-    await _auth.createUserWithEmailAndPassword(
+  
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
     );
 
-  
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful!')),
-      );
+    User? user = userCredential.user;
 
-      
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SignInScreen()),
-      );
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('profiles').doc(user.uid).set({
+        'name': _nameController.text,  
+        'email': user.email,          
+        'uid': user.uid,         
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SignInScreen()),
+        );
+      }
     }
   } on FirebaseAuthException catch (e) {
-    
     if (kDebugMode) {
       print("Firebase Hatası: ${e.code} - ${e.message}");
-    }  
+    }
     if (mounted) {
       String errorMessage = '';
 
-      
       switch (e.code) {
         case 'weak-password':
           errorMessage = "Your password is too weak. Please choose a stronger password.";
@@ -70,20 +77,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
           errorMessage = e.message ?? "An error occurred. Please try again.";
           break;
       }
+       if (_nameController.text.trim().isEmpty) {
+          setState(() {
+    _errorMessage = "Please enter your name.";
+  });
+  return; 
+}
 
       setState(() {
         _errorMessage = errorMessage;
       });
-        }
-      } catch (e) {
-        if (kDebugMode) {
+    }
+  } catch (e) {
+    if (kDebugMode) {
       print("General Error: $e");
-        }  
-        if (mounted) {
+    }
+    if (mounted) {
       setState(() {
         _errorMessage = "An error occurred. Please try again.";
       });
-        }
+    }
   } finally {
     if (mounted) {
       setState(() {
@@ -99,104 +112,105 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return CustomScaffold(
       title: "Travel Log",
       showBackButton: true,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Center(
-            child: Text(
-              'Create Account',
-              style: GoogleFonts.splineSans(
-                textStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF111418),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 48),
-
-          // Name
-          _buildTextField(_nameController, 'Name'),
-          // Email
-          _buildTextField(_emailController, 'Email address'),
-          // Password
-          _buildTextField(_passwordController, 'Password', obscure: true),
-
-          const SizedBox(height: 30),
-
-          if (_errorMessage != null && _errorMessage!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Center(
               child: Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
+                'Create Account',
+                style: GoogleFonts.splineSans(
+                  textStyle: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF111418),
+                  ),
+                ),
               ),
             ),
+            const SizedBox(height: 48),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color(0xFF0b79ee),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
+            // Name
+            _buildTextField(_nameController, 'Name'),
+            // Email
+            _buildTextField(_emailController, 'Email address'),
+            // Password
+            _buildTextField(_passwordController, 'Password', obscure: true),
+
+            const SizedBox(height: 30),
+
+            if (_errorMessage != null && _errorMessage!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF0b79ee),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
                       ),
-                    ),
-                    onPressed: _isLoading ? null : _signUp,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              letterSpacing: 1.2,
+                      onPressed: _isLoading ? null : _signUp,
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                letterSpacing: 1.2,
+                              ),
                             ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF111418),
-                      backgroundColor:
-                          const Color.fromARGB(255, 206, 214, 223),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignInScreen()),
-                      );
-                    },
-                    child: const Text(
-                      'Existing User Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        letterSpacing: 1.2,
-                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF111418),
+                        backgroundColor: const Color.fromARGB(255, 206, 214, 223),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignInScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Existing User Sign In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

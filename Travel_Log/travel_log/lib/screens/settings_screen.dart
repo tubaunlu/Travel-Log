@@ -41,32 +41,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final Color subtitleColor = const Color(0xFF60748a);
 
   // Firebase'den profil verilerini al
+  
   Future<void> _loadProfileData() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      try {
-        final userProfileRef = FirebaseFirestore.instance.collection('profiles').doc(currentUser.uid);
-        final docSnapshot = await userProfileRef.get();
+  final currentUser = FirebaseAuth.instance.currentUser;
+  if (currentUser != null) {
+    try {
+  
+      final userProfileRef = FirebaseFirestore.instance.collection('profiles').doc(currentUser.uid);
+      final docSnapshot = await userProfileRef.get();
 
-        if (docSnapshot.exists) {
-          final data = docSnapshot.data();
-          setState(() {
-            name = data?['name'] ?? 'No Name';
-          });
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error loading profile data: $e');
-        }
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        setState(() {
+          name = data?['name'] ?? 'No Name';  
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading profile data: $e');
       }
     }
   }
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileData(); 
-  }
+@override
+void initState() {
+  super.initState();
+  _loadProfileData();  
+}
 
   List<Map<String, dynamic>> getAccountItems(BuildContext context) {
     return [
