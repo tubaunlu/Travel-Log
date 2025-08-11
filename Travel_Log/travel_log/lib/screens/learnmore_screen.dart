@@ -7,7 +7,6 @@ class LearnmoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const backgroundColor = Colors.white;
-    // ignore: unused_local_variable
     const primaryColor = Color(0xFF0c92f2);
     const textColorPrimary = Color(0xFF111518);
     const textColorSecondary = Color(0xFF60798a);
