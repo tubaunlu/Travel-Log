@@ -40,7 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final Color titleColor = const Color(0xFF111418);
   final Color subtitleColor = const Color(0xFF60748a);
 
-  // Firebase'den profil verilerini al
+  
   
   Future<void> _loadProfileData() async {
   final currentUser = FirebaseAuth.instance.currentUser;
