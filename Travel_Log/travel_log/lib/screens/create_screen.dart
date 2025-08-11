@@ -128,7 +128,6 @@ class _CreateScreenState extends State<CreateScreen> {
     'Couple Trip',
     'Winter Trip',
     'Summer Trip',
-    'Beach Vacation',
     'Leisure Trip',
     'Romantic Trip',
     'Family Trip',
