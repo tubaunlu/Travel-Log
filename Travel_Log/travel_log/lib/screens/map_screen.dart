@@ -220,8 +220,8 @@ Widget build(BuildContext context) {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.black,
                     elevation: 1,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8), // padding de küçültüldü
-                    textStyle: const TextStyle(fontSize: 14), // yazı boyutu küçültüldü
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8), 
+                    textStyle: const TextStyle(fontSize: 14), 
                   ),
                   child: const Text("Save Location"),
                   ),
